@@ -10,7 +10,7 @@
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
     "js-cookie": "^3.0.5",
-    "next": "15.5.4",
+    "next": "15.5.9",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
