@@ -1,7 +1,7 @@
 import Cookies from "js-cookie";
 
 //BACKEND_DOMAIN_API
-let localHost = true;
+let localHost = false;
 /*
 if (window.location.href.indexOf("localhost") > -1) {
     localHost = true;
@@ -10,7 +10,7 @@ let customDomain = false;
 
 const localPort = 5000;
 
-let serverUrl = `https://panelboard-lite-api.vercel.app/api`;
+let serverUrl = `https://fieldproject-server.vercel.app/api`;
 if (localHost){
     serverUrl = `http://localhost:${localPort}/api`;
 }
