@@ -1,6 +1,6 @@
 # 22-05
 
-- [ ] **Resolver kickeos**
+- [ ] **Resolver kickeos "falsos"**
 - [X] **Portal Administrador:** Hacer que se vea bien al entrar por primera vez
 - [x] **Seguridad:** No permitir que un miembro se cree un permiso para sí mismo. *(Resolución: Evitado en la función de backend `create-permission`)*
 - [x] **Navbar:** Mostrar automáticamente (sin recargar página) el nombre de usuario.
