@@ -32,26 +32,34 @@ export default function Login() {
       });
 
       if (response.ok) {
+        // 1. Guardamos la cookie de sesión de inmediato
         Cookies.set("session_key", newSessionKey, { expires: 1 });
-        loggedIn.value = true;
-        loggedUserId.value = associatedUserId;
         
-        const secondResponse = await fetch(`${serverUrl}/get-user/${loggedUserId.value}`); 
+        // 2. Traemos la información actualizada del usuario desde la API
+        const secondResponse = await fetch(`${serverUrl}/get-user/${associatedUserId}`); 
         const userDataBase = await secondResponse.json();
         const userData = Array.isArray(userDataBase) ? userDataBase[0] : userDataBase;
-        console.log(userData);
-        loggedIn.value = true;
-        loggedUserName.value = userData.username;
-      
+        
+        console.log("Datos de usuario obtenidos:", userData);
+        
+        // 3. Modificamos los estados globales reactivos. 
+        // El orden importa: Primero asignamos valores y al final marcamos loggedIn en true.
+        loggedUserId.value = userData?.id || associatedUserId;
+        loggedUserName.value = userData?.username || userData?.username || "Usuario";
+        loggedIn.value = true; 
 
-        if(secondResponse.ok){
+        if (secondResponse.ok) {
+          // 4. Redirigimos una vez que toda la memoria global fue notificada
           router.push("/boards");
         }
       } else {
         setError("Error al crear la sesión.");
+        setLoading(false);
       }
     } catch (err) {
+      console.error(err);
       setError("Error de conexión.");
+      setLoading(false);
     }
   };
 
@@ -103,7 +111,7 @@ export default function Login() {
               <Input
                 type="text"
                 placeholder="nombre_usuario"
-                className="bg-black border-zinc-700 text-white focus:border-blue-500" // Ensure your Input component accepts className
+                className="bg-black border-zinc-700 text-white focus:border-blue-500"
                 value={user}
                 onChange={(e) => setUser(e.target.value)}
               />

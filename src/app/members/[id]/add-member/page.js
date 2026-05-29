@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import Input from "@/components/input";
 import { useState } from "react";
 import { callApi } from "@/components/call-api";
-import { serverUrl } from "@/global-variables";
+import { loggedUserId, serverUrl } from "@/global-variables";
 
 export default function AddMember() {
   const [userName, setUserName] = useState("");
@@ -26,8 +26,10 @@ export default function AddMember() {
     console.log("Creando miembro...");
 
     try {
+      const associated_user_id = loggedUserId.value;
       const res = await callApi(`${serverUrl}/create-permission/${id}`, "POST", {
         userName,
+        associated_user_id,
         permission,
       });
 
@@ -37,6 +39,8 @@ export default function AddMember() {
         navigateBack(); // Navigate ONLY after success
       } else if (res.status === 500) {
         alert("Error: Nombre de usuario no válido o error de servidor");
+      } else if (res.status === 406) {
+        alert("Error: Se esta creando un permiso para usted mismo");
       } else {
         alert(res?.message || "Ocurrió un error inesperado");
       }

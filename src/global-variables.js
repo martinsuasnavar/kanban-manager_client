@@ -1,27 +1,20 @@
 import Cookies from "js-cookie";
 
-//BACKEND_DOMAIN_API
-let localHost = false;
-/*
-if (window.location.href.indexOf("localhost") > -1) {
-    localHost = true;
-}*/
+// SERVER/SERVERLESS FUNCTIONS REFERENCE
+const localHost = process.env.NEXT_PUBLIC_LOCALHOST === "true";
 let customDomain = false;
-
 const localPort = 5000;
 
 let serverUrl = `https://fieldproject-server.vercel.app/api`;
-if (localHost){
+if (localHost) {
     serverUrl = `http://localhost:${localPort}/api`;
 }
-if (customDomain){
+if (customDomain) {
     serverUrl = `?:${localPort}/api`;
 }
 export { serverUrl };
 
-
-
-//SELECTED_PROJECT_ID
+// SELECTED_PROJECT_ID
 let selectedProjectId = { value: 11 };
 export { selectedProjectId };
 
@@ -29,55 +22,80 @@ var userArray = [];
 
 // Fetch users function
 const fetchUsers = async () => {
-    const response = await fetch(`${serverUrl}/users`);
-    const data = await response.json();
     try {
         console.log("Fetching users...");
+        const response = await fetch(`${serverUrl}/users`);
+        const data = await response.json();
         userArray = data;
         console.log(userArray);
     } catch (error) {
         console.log(`Couldn't fetch users: `, error);
     }
 };
-fetchUsers();
+
+// Evitamos ejecutar fetches en la raíz si estamos en el servidor (SSR)
+if (typeof window !== "undefined") {
+    fetchUsers();
+}
 
 export { userArray };
 
-//CURRENT_PROJECT_NAME
+// CURRENT_PROJECT_NAME
 let currentProjectName = { value: 'undefined '};
 export { currentProjectName };
 
-
-
-//CURRENT_EDITED_NOTE_ID
-let editingNoteId = { value: 0 }
+// CURRENT_EDITED_NOTE_ID
+let editingNoteId = { value: 0 };
 export { editingNoteId };
 
-
-
-//get data arrays, unnecessary?
 var projectArray = [];
-/*
-const dataReferences = ['sessions', 'projects', 'panels', 'notes'];
-var DATA_ARRAYS = [];
-const getAllDataTypes = async () => {
-    for (let i = 0; i < dataReferences.length; i++){
-        const response = await callApi(`${backendDomain}/${dataReferences[i]}`, "GET");
 
-        //console.log('new data: ' +  DATA_ARRAYS[i])
+// ==========================================
+// ESTADOS GLOBALES REACTIVOS (CON EVENTOS)
+// ==========================================
+
+// Función auxiliar para emitir el evento a la Navbar
+const emitAuthChange = () => {
+    if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("auth-change"));
     }
-    projectArray = await callApi(`${backendDomain}/projects`, "GET");
-}
-getAllDataTypes();
-export { DATA_ARRAYS };
-export { projectArray };
-*/
-//LOGGED IN CONDITION
-// Estados globales
-let loggedIn = { value: false };
-let loadingState = { value: true }; // true al inicio hasta saber el estado real
-let loggedUserId = { value: 0 };
-let loggedUserName = { value: "" };
+};
+
+export const loggedIn = {
+    _value: false,
+    get value() { return this._value; },
+    set value(newValue) {
+        this._value = newValue;
+        emitAuthChange();
+    }
+};
+
+export const loadingState = {
+    _value: true,
+    get value() { return this._value; },
+    set value(newValue) {
+        this._value = newValue;
+        emitAuthChange();
+    }
+};
+
+export const loggedUserId = {
+    _value: 0,
+    get value() { return this._value; },
+    set value(newValue) {
+        this._value = newValue;
+        emitAuthChange();
+    }
+};
+
+export const loggedUserName = {
+    _value: "",
+    get value() { return this._value; },
+    set value(newValue) {
+        this._value = newValue;
+        emitAuthChange();
+    }
+};
 
 // Función para obtener usuario logueado
 const getLoggedUser = async () => {
@@ -85,16 +103,12 @@ const getLoggedUser = async () => {
   loadingState.value = true;
 
   try {
-    // Pedimos todas las sesiones al servidor
     const response = await fetch(`${serverUrl}/sessions`);
     if (!response.ok) throw new Error("No se pudo obtener sesiones");
 
     const sessions = await response.json();
-
-  
-
-    // Buscamos cookie local
     const sessionKey = Cookies.get("session_key");
+    
     if (!sessionKey) {
       console.warn("No hay cookie de sesión.");
       loggedIn.value = false;
@@ -102,20 +116,21 @@ const getLoggedUser = async () => {
       return;
     }
 
-    // Buscamos sesión activa en la lista del servidor
-    const activeSession = sessions.find(
-      (s) => s.session_key === sessionKey
-    );
+    const activeSession = sessions.find((s) => s.session_key === sessionKey);
 
     if (activeSession) {
       console.log("Sesión válida encontrada:", activeSession);
-      loggedIn.value = true;
+      
+      // Asignamos el ID primero
       loggedUserId.value = activeSession.associated_user_id;
-        const response = await fetch(`${serverUrl}/get-user/${loggedUserId.value}`);
-        const data = await response.json();
+      
+      const userResponse = await fetch(`${serverUrl}/get-user/${loggedUserId.value}`);
+      const data = await userResponse.json();
       const user = Array.isArray(data) ? data[0] : data;
-        loggedUserName.value=user?.username;
-     
+      
+      // Guardamos el nombre y activamos el login
+      loggedUserName.value = user?.username || "Usuario";
+      loggedIn.value = true; 
     } else {
       console.warn("Sesión inválida o expirada.");
       loggedIn.value = false;
@@ -130,8 +145,9 @@ const getLoggedUser = async () => {
   }
 };
 
-// Ejecutamos al cargar el módulo
-await getLoggedUser();
+// En Next.js, ejecutamos la inicialización de forma segura solo en el cliente
+if (typeof window !== "undefined") {
+    getLoggedUser();
+}
 
-// Exportamos los estados y función
-export { loggedIn, loggedUserId, loggedUserName, loadingState, getLoggedUser };
+export { getLoggedUser };

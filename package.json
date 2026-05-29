@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
+    "dotenv": "^17.4.2",
     "js-cookie": "^3.0.5",
     "next": "^16.2.6",
     "react": "^19.2.6",
