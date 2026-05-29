@@ -238,6 +238,7 @@ export default function SelectedBoard() {
   // =========================
 
   const createColumn = async () => {
+    
     if (permissionType !== "write") {
       window.alert("Solo tiene permisos de lectura");
       return;
@@ -252,10 +253,12 @@ export default function SelectedBoard() {
 
       if (res.status === 201) {
         fetchColumns();
+
       }
     } catch (error) {
       console.error("Error creating column:", error);
     }
+     
   };
 
   // =========================
@@ -350,96 +353,65 @@ export default function SelectedBoard() {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="bg-[url('/bgboard.png')] bg-no-repeat bg-fixed bg-cover bg-center font-sans min-h-screen p-8">
+<>
+  {/* 1. Fondo completamente aislado y fijo */}
+  <div className="fixed inset-0 -z-10 bg-[url('/bgboard.png')] bg-no-repeat bg-cover bg-center" />
 
-        <main className="w-max flex-1">
+  {/* 2. Contenedor principal que maneja el scroll de la pantalla */}
+  <main className="font-sans min-h-screen p-8 overflow-auto w-screen">
+    
+    {/* 3. Contenedor del proyecto con ancho adaptable al contenido */}
+    <div className="project-container w-max min-w-full">
 
-          <div className="project-container">
-
-            <div className="flex items-center gap-3 mb-10">
-
-              {isEditingName ? (
-                <>
-                  <RedButton onClick={deleteBoard}>
-                    Eliminar
-                  </RedButton>
-
-                  <input
-                    type="text"
-                    value={boardName}
-                    onChange={(e) =>
-                      setBoardName(e.target.value)
-                    }
-                    className="text-5xl font-bold border-b border-gray-400 outline-none bg-transparent"
-                  />
-
-                  <Button onClick={updateBoardName}>
-                    Guardar
-                  </Button>
-                </>
-              ) : (
-                <h1
-                  className="text-5xl font-bold cursor-pointer"
-                  onClick={() =>
-                    setIsEditingName(true)
-                  }
-                >
-                  {boardName}
-                </h1>
-              )}
-            </div>
-
-            <div className="flex gap-14">
-
-              {columns.map((column) => (
-                <BoardColumn
-                  key={column.column_id}
-                  linked_column_id={column.column_id}
-                  permission_type={permissionType}
-                  tasks={column.tasks}
-                  column_name={column.name}
-                />
-              ))}
-
-              {permissionType === "write" && (
-                <button
-                  onClick={createColumn}
-                  className="
-                    mt-4
-                    flex-none
-                    w-55
-                    h-30
-                    flex
-                    items-center
-                    justify-center
-                    gap-2
-                    bg-white/10
-                    hover:bg-white/20
-                    backdrop-blur-sm
-                    border-2
-                    border-dashed
-                    border-white/30
-                    hover:border-white/50
-                    rounded-xl
-                    text-white
-                    font-medium
-                    transition-all
-                    duration-200
-                    cursor-pointer
-                  "
-                >
-                  <span className="text-2xl">+</span>
-                  <span>Añadir columna</span>
-                </button>
-              )}
-
-            </div>
-
-          </div>
-
-        </main>
-
+      {/* Título y botones */}
+      <div className="flex items-center gap-3 mb-10">
+        {isEditingName ? (
+          <>
+            <RedButton onClick={deleteBoard}>Eliminar</RedButton>
+            <input
+              type="text"
+              value={boardName}
+              onChange={(e) => setBoardName(e.target.value)}
+              className="text-5xl font-bold border-b border-gray-400 outline-none bg-transparent"
+            />
+            <Button onClick={updateBoardName}>Guardar</Button>
+          </>
+        ) : (
+          <h1
+            className="text-5xl font-bold cursor-pointer"
+            onClick={() => setIsEditingName(true)}
+          >
+            {boardName}
+          </h1>
+        )}
       </div>
+
+      {/* Columnas del tablero */}
+      <div className="flex gap-14 items-start">
+        {columns.map((column) => (
+          <BoardColumn
+            key={column.column_id}
+            linked_column_id={column.column_id}
+            permission_type={permissionType}
+            tasks={column.tasks}
+            column_name={column.name}
+          />
+        ))}
+
+        {permissionType === "write" && (
+          <button
+            onClick={createColumn}
+            className="mt-4 flex-none w-55 h-30 flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-dashed border-white/30 hover:border-white/50 rounded-xl text-white font-medium transition-all duration-200 cursor-pointer"
+          >
+            <span className="text-2xl">+</span>
+            <span>Añadir columna</span>
+          </button>
+        )}
+      </div>
+
+    </div>
+  </main>
+</>
     </DragDropContext>
   );
 }
