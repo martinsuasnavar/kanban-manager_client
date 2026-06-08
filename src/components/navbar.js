@@ -73,6 +73,7 @@ export default function Navbar() {
         <Image alt="icono home" src="/home-icon.webp" width={20} height={20} /> 
       </div>
       
+       <Image src="/logo-white.png" alt="application logo"  width={250} height={250}></Image>
       <div className="flex gap-6 items-center">
         <div className="relative group">
           <button 
@@ -81,6 +82,7 @@ export default function Navbar() {
             <Image alt="icono de usuario" src="/user-icon.webp" width={20} height={20} /> 
             {loggedUserName.value || <LoadingAnimation height="15" width="15" />}
           </button>
+
 
           <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
             <div className="py-2 text-sm">

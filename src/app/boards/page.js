@@ -65,7 +65,7 @@ export default function UserBoardsAccess() {
   }, []);
 
   useEffect(() => {
-    if (!loggedUserId.value || loggedUserId.value === 0) {
+    if (loggedUserName.value=="no_user_found") {
       router.push("/login");
       return;
     }
@@ -103,7 +103,7 @@ export default function UserBoardsAccess() {
           <div className="flex gap-6 items-center mb-8">
             <h1 className="text-5xl font-bold">Proyectos</h1>
             <button
-              className="bg-green-500 hover:bg-green-400 transition-colors rounded-full px-4 py-2 text-black font-bold shadow-lg"
+              className="bg-green-500 hover:bg-green-400 transition-colors rounded-full px-4 py-2 text-black font-bold shadow-lg cursor-pointer"
               onClick={() => navigateTo("create-project")}
             >
               + Nuevo proyecto

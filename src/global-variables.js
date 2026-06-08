@@ -129,7 +129,7 @@ const getLoggedUser = async () => {
       const user = Array.isArray(data) ? data[0] : data;
       
       // Guardamos el nombre y activamos el login
-      loggedUserName.value = user?.username || "Usuario";
+      loggedUserName.value = user?.username || "no_user_found";
       loggedIn.value = true; 
     } else {
       console.warn("Sesión inválida o expirada.");
