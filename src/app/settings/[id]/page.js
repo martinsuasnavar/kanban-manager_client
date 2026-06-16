@@ -21,7 +21,7 @@ export default function UpdateProject() {
       const data = await response.json();
       const project = Array.isArray(data) ? data[0] : data;
       setProjectName(project?.name || "");
-      setDescription(project?.description || "");
+      setDescription(project?.desc || "");
     } catch (error) {
       console.error("Error al obtener el proyecto:", error);
     }
