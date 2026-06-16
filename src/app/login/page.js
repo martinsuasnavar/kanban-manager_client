@@ -41,9 +41,16 @@ export default function Login() {
         
         // 2. Traemos la información actualizada del usuario desde la API
         const secondResponse = await fetch(`${serverUrl}/get-user/${associatedUserId}`); 
+        
+      
+
         const userDataBase = await secondResponse.json();
         const userData = Array.isArray(userDataBase) ? userDataBase[0] : userDataBase;
-        
+         if(userData?.deactivate){
+          setError("Su cuenta ha sido desactivada.");
+          setLoading(false);
+          return;
+        }
         console.log("Datos de usuario obtenidos:", userData);
         
         // 3. Modificamos los estados globales reactivos. 
@@ -51,7 +58,7 @@ export default function Login() {
         loggedUserId.value = userData?.id || associatedUserId;
         loggedUserName.value = userData?.username || userData?.username || "Usuario";
         loggedIn.value = true; 
-
+        
         if (secondResponse.ok) {
           // 4. Redirigimos una vez que toda la memoria global fue notificada
           router.push("/boards");
