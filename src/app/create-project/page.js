@@ -9,6 +9,7 @@ import { serverUrl, loggedUserId } from "@/global-variables";
 
 export default function CreateProject() {
   const [name, setProjectName] = useState("");
+  const [desc, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -31,6 +32,7 @@ export default function CreateProject() {
       const res = await callApi(`${serverUrl}/create-project`, "POST", {
         name,
         associated_user_id,
+        desc
       });
       // La petición sigue en segundo plano mientras cambias de ruta
     } catch (error) {
@@ -68,6 +70,9 @@ export default function CreateProject() {
               <InputDescription 
                 type="text" 
                 placeholder="¿De qué trata este proyecto?" 
+                value={desc}
+                onChange={(e) => setDescription(e.target.value)}
+
               />
             </div>
           </div>
