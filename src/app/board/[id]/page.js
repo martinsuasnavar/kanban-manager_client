@@ -337,28 +337,29 @@ export default function SelectedBoard() {
     }
   };
 
-  // =========================
-  // EFFECTS
-  // =========================
+// =========================
+// EFFECTS (CORRECTED)
+// =========================
 
- useEffect(() => {
-    fetchBoard();
-    fetchColumns();
-  }, []);
+// 1. Initial Load: Runs exactly ONCE when the component mounts
+useEffect(() => {
+  fetchBoard();
+  fetchColumns();
+}, [id]); // Included 'id' per Next.js routing best practices
 
-  useEffect(() => {
-    if (boardEnvironment) {
-      fetchParentProject();
-    }
-        fetchBoard();
-    fetchColumns();
-  }, [boardEnvironment]);
+// 2. Project Fetch: Runs ONLY when a valid linked_project_id is available
+useEffect(() => {
+  if (boardEnvironment?.linked_project_id) {
+    fetchParentProject();
+  }
+}, [boardEnvironment?.linked_project_id]); // Target the primitive value, not the whole object
 
-  useEffect(() => {
-    if (parentProject) {
-      fetchBoardPermission();
-    }
-  }, [parentProject]);
+// 3. Permissions Fetch: Runs ONLY when the parent project data arrives
+useEffect(() => {
+  if (parentProject) {
+    fetchBoardPermission();
+  }
+}, [parentProject]);
 
   // =========================
   // RENDER
