@@ -3,7 +3,7 @@ import Button from "@/components/button";
 import CreateButton from "@/components/create-button";
 import { callApi } from "@/components/call-api";
 import { useState, useEffect, useCallback } from "react";
-import { serverUrl, loggedIn, loggedUserId, loggedUserName } from "@/global-variables";
+import { serverUrl, loggedIn, loggedUserId, loggedUserName, loadingState } from "@/global-variables";
 import { useRouter } from "next/navigation";
 import RedButton from "@/components/red-button";
 import BoardList from "@/components/board-list";
@@ -17,6 +17,7 @@ export default function UserBoardsAccess() {
   const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [admin, isAdmin] = useState(false);
+  const [isAuth, setIsAuth] = useState(false); // Estado local para escuchar la sesión
 
   // Mapeador de etiquetas
   const permissionLabels = {
@@ -64,15 +65,40 @@ export default function UserBoardsAccess() {
     }
   }, []);
 
+// 1. Escuchar el evento global de autenticación (igual que haces en la Navbar)
   useEffect(() => {
-    console.log("user name is " + loggedUserName.value)
-    if (loggedUserName.value=="no_user_found") {
+    const syncAuth = () => {
+      setIsAuth(loggedIn.value);
+    };
+    
+    syncAuth(); // Sincroniza estado inicial
+    window.addEventListener("auth-change", syncAuth);
+    return () => window.removeEventListener("auth-change", syncAuth);
+  }, []);
+
+  // 2. Controlar la redirección y carga de datos basándonos en si la sesión terminó de cargar
+  useEffect(() => {
+    // Si las variables globales todavía están buscando la sesión en el backend, no hacemos nada.
+    if (loadingState.value) return;
+
+    // Una vez que terminó de cargar la sesión global:
+    if (!loggedIn.value || loggedUserName.value === "no_user_found") {
       router.push("/login");
-      return;
+    } else {
+      // Si el usuario existe y está autenticado, buscamos sus proyectos
+      fetchUserData();
+      getAdmin().finally(() => setLoading(false));
     }
-    fetchUserData();
-    getAdmin();
-  }, [fetchUserData, router]);
+  }, [isAuth, router, fetchUserData]);
+
+  // Si la sesión global está cargando O el componente local está procesando los proyectos
+  if (loadingState.value || loading) {
+    return (
+      <div className="p-20 text-white flex justify-center">
+        <LoadingAnimation height="40" width="40"/>
+      </div>
+    );
+  }
 
   const logOut = () => {
     Cookies.remove("session_key");
