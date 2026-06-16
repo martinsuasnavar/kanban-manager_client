@@ -52,7 +52,7 @@ export default function Members() {
     getAssociatedUsers();
   }, [id]);
 
-return (
+  return (
     <div className="font-sans min-h-screen p-8 sm:p-20 bg-gray-900 text-white">
       <main className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-10">

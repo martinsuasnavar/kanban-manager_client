@@ -73,7 +73,7 @@ export default function Navbar() {
         <Image alt="icono home" src="/home-icon.webp" width={20} height={20} /> 
       </div>
       
-       <Image src="/logo-white.png" alt="application logo"  width={250} height={250}></Image>
+      
       <div className="flex gap-6 items-center">
         <div className="relative group">
           <button 

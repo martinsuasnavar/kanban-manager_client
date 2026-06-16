@@ -1,7 +1,7 @@
 "use client";
 import Button from "@/components/button";
 import Input from "@/components/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { loggedIn, serverUrl, userArray, loggedUserId, loggedUserName } from "../../global-variables";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
@@ -13,6 +13,10 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(""); 
   const [loading, setLoading] = useState(false);
+  const [foundCookie,setFoundCookie] = useState(false);
+
+
+
 
   const generateToken = () => {
     const rand = () => Math.random().toString(36).substr(2);
@@ -82,75 +86,98 @@ export default function Login() {
     }
   };
 
+  const verifySessionCookie = () =>{
+    if (Cookies.get("session_key")){
+      setFoundCookie(true);
+      router.push("/boards");
+    }
+  }
+
+ useEffect(
+  ()=>{
+    verifySessionCookie();
+  },
+  [])
+
+ // console.log("current logged user in login screen is " + loggedIn.value)
+
   return (
     /* Main Container: Pure Black Background */
     <div className="font-sans min-h-screen flex items-center justify-center bg-black text-white">
+       {!foundCookie && (
       <main className="w-full max-w-md p-4">
+
+
+       
+       
         <div className="flex align-center justify-center mb-4"><Image src="/logo-white.png" alt="application logo"  width={350} height={350}></Image></div>
-        {/* Login Card: Dark Gray with a slight border */}
-        <div className="bg-zinc-900 rounded-2xl shadow-2xl p-10 border border-zinc-800">
-          <h1 className="text-3xl text-center font-bold mb-2">
-            Bienvenido
-          </h1>
-          <p className="text-zinc-400 text-center mb-8 text-sm">
-            
-          </p>
+          {/* Login Card: Dark Gray with a slight border */}
+          <div className="bg-zinc-900 rounded-2xl shadow-2xl p-10 border border-zinc-800">
+            <h1 className="text-3xl text-center font-bold mb-2">
+              Bienvenido
+            </h1>
+            <p className="text-zinc-400 text-center mb-8 text-sm">
+              
+            </p>
 
-          <div className="space-y-6">
-            {/* Error Message */}
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg text-sm text-center font-medium">
-                {error}
+            <div className="space-y-6">
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg text-sm text-center font-medium">
+                  {error}
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs uppercase tracking-widest font-semibold mb-2 text-zinc-200">
+                  Usuario / Correo
+                </label>
+                <Input
+                  type="text"
+                  placeholder="nombre_usuario"
+                  className="bg-black border-zinc-700 text-white focus:border-blue-500"
+                  value={user}
+                  onChange={(e) => setUser(e.target.value)}
+                />
               </div>
-            )}
 
-            <div>
-              <label className="block text-xs uppercase tracking-widest font-semibold mb-2 text-zinc-200">
-                Usuario / Correo
-              </label>
-              <Input
-                type="text"
-                placeholder="nombre_usuario"
-                className="bg-black border-zinc-700 text-white focus:border-blue-500"
-                value={user}
-                onChange={(e) => setUser(e.target.value)}
-              />
-            </div>
+              <div>
+                <label className="block text-xs uppercase tracking-widest font-semibold mb-2 text-zinc-200">
+                  Contraseña
+                </label>
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  className="bg-black border-zinc-700 text-white focus:border-blue-500"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
 
-            <div>
-              <label className="block text-xs uppercase tracking-widest font-semibold mb-2 text-zinc-200">
-                Contraseña
-              </label>
-              <Input
-                type="password"
-                placeholder="••••••••"
-                className="bg-black border-zinc-700 text-white focus:border-blue-500"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+              <div className="pt-4">
+                <Button 
+                  onClick={logIn} 
+                  className="w-full py-3 bg-white text-black hover:bg-zinc-200 transition-all font-bold rounded-lg"
+                  disabled={loading}
+                >
+                  {loading ? "Cargando..." : "Entrar"}
+                </Button>
+              </div>
 
-            <div className="pt-4">
-              <Button 
-                onClick={logIn} 
-                className="w-full py-3 bg-white text-black hover:bg-zinc-200 transition-all font-bold rounded-lg"
-                disabled={loading}
-              >
-                {loading ? "Cargando..." : "Entrar"}
-              </Button>
-            </div>
-
-            <div className="text-center pt-2">
-              <a
-                href="/signup"
-                className="text-sm text-zinc-400 hover:text-white transition-colors"
-              >
-                ¿No tienes cuenta? <span className="text-blue-400 font-medium">Regístrate</span>
-              </a>
-            </div>
+              <div className="text-center pt-2">
+                <a
+                  href="/signup"
+                  className="text-sm text-zinc-400 hover:text-white transition-colors"
+                >
+                  ¿No tienes cuenta? <span className="text-blue-400 font-medium">Regístrate</span>
+                </a>-
+              </div>
+           
           </div>
+           
         </div>
       </main>
+       )}
     </div>
   );
 }
