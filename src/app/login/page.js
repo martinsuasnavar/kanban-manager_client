@@ -177,7 +177,7 @@ export default function Login() {
                   className="text-sm text-zinc-400 hover:text-white transition-colors"
                 >
                   ¿No tienes cuenta? <span className="text-blue-400 font-medium">Regístrate</span>
-                </a>-
+                </a>
               </div>
            
           </div>
